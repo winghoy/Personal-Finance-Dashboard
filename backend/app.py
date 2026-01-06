@@ -24,8 +24,6 @@ def get_category_sums():
     response = df.to_dict(orient='records')
     return response
 
-# Category sums {other formats?}
-
 # Sums up all transactions in each month
 @app.get('/monthly_sums')
 def get_monthly_sums():
@@ -35,6 +33,7 @@ def get_monthly_sums():
     df = df[['month', 'amount']]
     response = df.to_dict(orient='records')
     return response
+
 # Spending by category per month
 
 
