@@ -62,5 +62,4 @@ categories = {
     'Entertainment': 'leisure activities, entertainment venue, attractions, cinema, bowling, events',
     'Shopping': 'retail stores, clothing shops, home goods, electronics, general shopping',
     'Subscriptions': 'gym membership, recurring payments, monthly services, mobile plans, music streaming, video streaming, digital subscriptions'
-    # 'Other': 'miscellaneous, uncategorised, unknown merchants'
 }

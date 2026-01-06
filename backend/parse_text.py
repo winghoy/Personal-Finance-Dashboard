@@ -3,9 +3,10 @@ import re
 from rapidfuzz import process, fuzz
 from config import merchants_map, months, months_dict, categories
 from sentence_transformers import SentenceTransformer
+from collections import defaultdict
 
-out = []
-file = pymupdf.open('./files/dec25.pdf')
+output = defaultdict(list)
+file = pymupdf.open('../files/dec25.pdf')
 model = SentenceTransformer('all-MiniLM-L6-v2')
 current_date = ''
 
@@ -39,7 +40,8 @@ def parse_file(file):
                 if m in line and len(line) < 10:
                     words = line.split(' ')
                     words[1] = months_dict.get(words[1])
-                    current_date = '/'.join(word for word in words)
+                    words[2] = '20' + words[2]
+                    current_date = '-'.join(word for word in words[::-1])
 
             if line in [')))', 'VIS', 'BP', 'OBP']:
                 line_number += 1
@@ -49,12 +51,12 @@ def parse_file(file):
                 merchant = normalise_text(line)
                 merchant = match_merchant(merchant)
                 transaction.append(merchant)
-                # a.append(merchant)
+                output['merchant'].append(merchant)
 
                 # Categorise
                 if merchant in merchants_map:
                     transaction.append(merchants_map[merchant])
-                    # b.append(merchants_map[merchant])
+                    output['category'].append(merchants_map[merchant])
                 else:
                     category = None
                     highest_score = -1
@@ -66,21 +68,28 @@ def parse_file(file):
                             category = cat
                     if highest_score > 0.2:
                         transaction.append(category)
-                        # b.append(category)
+                        output['category'].append(category)
                     else:
                         transaction.append('Other')
-                        # b.append('Other')
+                        output['category'].append('Other')
 
                 
                 # Iterate until it goes through the first instance of a price
                 while line[-3] != '.' or line[-1] not in '1234567890':
                     line_number += 1
                     line = lines[line_number]
-                transaction.append(line) # Price
-                # c.append(line)
+                transaction.append(line) # Amount
+                output['amount'].append(line)
                 transaction.append(current_date)
-                # d.append(current_date)
-                out.append(transaction)
+                output['date'].append(current_date)
                 
             line_number += 1
 parse_file(file)
+
+import pandas as pd
+df = pd.DataFrame(
+    {
+        index: transactions for index, transactions in output.items()
+    }
+)
+df.to_csv('test.csv', index=False)
