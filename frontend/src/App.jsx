@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import 'chart.js/auto';
 import Chart from './components/Chart';
 import "./App.css";
-import CategoryPie from './charts/category';
-import MonthlyLine from './charts/Monthly';
 
 function App() {
   const [chart, setChart] = useState(null);
@@ -12,11 +10,14 @@ function App() {
   return (
     <main className="container">
       <li>
-        <button onClick={() => setChart('category_sums')}>
+        <button onClick={() => setChart('category')}>
           Category Sums
         </button>
-        <button onClick={() => setChart('monthly_sums')}>
+        <button onClick={() => setChart('monthly')}>
           Monthly Sums
+        </button>
+        <button onClick={() => setChart('merchants')}>
+          Top Merchants
         </button>
       </li>
       <select onChange={(e) => setChartType(e.target.value)}>
@@ -25,7 +26,7 @@ function App() {
           <option value='bar'>Bar</option>
       </select>
       <section>
-        {chart === 'category_sums' && <Chart 
+        {chart === 'category' && <Chart 
           endpoint={chart}
           label={'category'}
           keyName={'Total Amount'}
@@ -33,9 +34,17 @@ function App() {
           chartType={chartType}
         />}
 
-        {chart === 'monthly_sums' && <Chart 
+        {chart === 'monthly' && <Chart 
           endpoint={chart}
           label={'month'}
+          keyName={'Total Amount'}
+          keyValue={'amount'}
+          chartType={chartType}
+        />}
+
+        {chart === 'merchants' && <Chart 
+          endpoint={chart}
+          label={'merchant'}
           keyName={'Total Amount'}
           keyValue={'amount'}
           chartType={chartType}

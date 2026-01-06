@@ -17,6 +17,7 @@ export default function Chart({
             try {
                 const response = await axios.get(`http://localhost:8000/${endpoint}`);
                 const data = response.data
+                console.log(response)
                 setChartData({
                     labels: data.map((d) => d[label]),
                     datasets: [
