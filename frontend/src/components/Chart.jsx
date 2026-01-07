@@ -32,7 +32,7 @@ export default function Chart({
             }
         }
         fetchData()
-    }, []);
+    }, [endpoint]);
 
     if (!chartData) return <Loading />
 

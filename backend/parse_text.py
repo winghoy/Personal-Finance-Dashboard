@@ -41,7 +41,7 @@ def parse_file(file):
                     words = line.split(' ')
                     words[1] = months_dict.get(words[1])
                     words[2] = '20' + words[2]
-                    current_date = '-'.join(word for word in words[::-1])
+                    current_date = '/'.join(word for word in words)
 
             if line in [')))', 'VIS', 'BP', 'OBP']:
                 line_number += 1

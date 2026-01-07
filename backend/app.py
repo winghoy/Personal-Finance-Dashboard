@@ -13,7 +13,8 @@ app.add_middleware(
 
 def load_csv():
     df = pd.read_csv('test.csv')
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], dayfirst=True)
+    df['amount'] = df['amount'].astype(float)
     return df
 
 def filter_df(df, year, month, start, end):
@@ -27,42 +28,82 @@ def filter_df(df, year, month, start, end):
         df = df[df['date'] <= pd.to_datetime(end)]
     return df
 
-# df = pd.DataFrame({
-#     'amount': ['100.00', '2400.00'],
-#     'date': pd.to_datetime(pd.Series(['2025-10-01','2026-11-01']))
-# })
-
-# print(filter_df(df, year=2025, month=10))
-
 # Sums up all transactions per category
 @app.get('/category')
 def get_category_sums(year: int = None, 
                       month: int = None, 
                       start: str = None, 
                       end: str = None):
-    df = load_csv()
+    df = root_df.copy()
     df = filter_df(df, year, month, start, end)
-    df = df.groupby('category')['amount'].sum().reset_index()
+    df = (
+        df.groupby('category')['amount']
+        .sum()
+        .reset_index()
+    )
     response = df.to_dict(orient='records')
     return response
 
 # Sums up all transactions in each month
 @app.get('/monthly')
-def get_monthly_sums():
-    df = load_csv()
-    df = df.set_index('date').resample('ME')['amount'].sum().reset_index()
-    df['month'] = df['date'].dt.strftime('%Y-%m')
+def get_monthly_sums(year: int = None, 
+                     month: int = None, 
+                     start: str = None, 
+                     end: str = None):
+    df = root_df.copy()
+    df = filter_df(df, year, month, start, end)
+    df = (
+        df.set_index('date')
+        .resample('ME')['amount']
+        .sum()
+        .reset_index()
+    )
+    df['month'] = df['date'].dt.strftime('%m/%Y')
     df = df[['month', 'amount']]
     response = df.to_dict(orient='records')
     return response
 
 # List of top merchants
 @app.get('/merchants')
-def get_merchants():
-    df = load_csv()
-    df = df.groupby('merchant')['amount'].sum().reset_index()
+def get_merchants(year: int = None, 
+                  month: int = None, 
+                  start: str = None, 
+                  end: str = None):
+    df = root_df.copy()
+    df = filter_df(df, year, month, start, end)
+    df = (
+        df.groupby('merchant')['amount']
+        .sum()
+        .reset_index()
+    )
     df = df.sort_values(by=['amount', 'merchant'], ascending=False)
     response = df.to_dict(orient='records')
     return response
 
-# Daily spending heatmap
+# Daily spending
+@app.get('/daily')
+def get_daily(year: int = None, 
+              month: int = None, 
+              start: str = None, 
+              end: str = None):
+    df = root_df.copy()
+    df = filter_df(df, year, month, start, end)
+    date_range = pd.date_range(df['date'].min(), df['date'].max())
+    df = (
+        df.groupby('date', as_index=True)['amount']
+        .sum()
+        .reindex(date_range, fill_value=0)
+        .rename_axis('date')
+        .reset_index()
+    )
+    df['date'] = df['date'].dt.strftime('%d/%m/%Y')
+    response = df.to_dict(orient='records')
+    return response
+
+
+def get_years():
+    df = load_csv()
+    years = df['date'].dt.year.unique().tolist()
+    return {'years': years}
+
+root_df = load_csv()
