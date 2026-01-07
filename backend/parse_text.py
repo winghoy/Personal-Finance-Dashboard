@@ -6,7 +6,7 @@ from sentence_transformers import SentenceTransformer
 from collections import defaultdict
 
 output = defaultdict(list)
-file = pymupdf.open('../files/dec25.pdf')
+file = pymupdf.open('../files/nov25.pdf')
 model = SentenceTransformer('all-MiniLM-L6-v2')
 current_date = ''
 
@@ -92,4 +92,4 @@ df = pd.DataFrame(
         index: transactions for index, transactions in output.items()
     }
 )
-df.to_csv('test.csv', index=False)
+df.to_csv('test2.csv', index=False)

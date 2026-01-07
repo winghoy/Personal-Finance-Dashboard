@@ -100,10 +100,11 @@ def get_daily(year: int = None,
     response = df.to_dict(orient='records')
     return response
 
-
-def get_years():
-    df = load_csv()
+@app.get('/date')
+def get_date():
+    df = root_df.copy()
     years = df['date'].dt.year.unique().tolist()
-    return {'years': years}
+    months = df['date'].dt.month.unique().tolist()
+    return {'years': years, 'months': months}
 
 root_df = load_csv()
