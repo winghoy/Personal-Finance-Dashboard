@@ -33,7 +33,7 @@ function App() {
       'start': formData.get('start'),
       'end': formData.get('end')
     })
-    
+    console.log(queries)
     // e.target.reset()
   }
   
@@ -87,16 +87,22 @@ function App() {
         <form onSubmit={action}>
           <label>Year</label>
           <select name='year'>
+            <option value={''}>—</option>
             {dateOptions.years.map(x => (
               <option key={x} value={x}>{x}</option>
             ))}
           </select>
           <label>Month</label>
           <select name='month'>
+            <option value={''}>—</option>
             {dateOptions.months.map(x => (
               <option key={x} value={x}>{getMonth(x)}</option>
             ))}
           </select>
+          <label>Start</label>
+          <input type='date' name='start' />
+          <label>End</label>
+          <input type='date' name='end' />
           <button type='submit'>Filter</button>
         </form>}
       {chart && 
