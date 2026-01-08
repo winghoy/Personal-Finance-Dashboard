@@ -22,19 +22,13 @@ function App() {
   const [queries, setQueries] = useState(intiialQueryState);
   const [chartType, setChartType] = useState('pie');
   const [dateOptions, setDateOptions] = useState(initialDateOptionsState)
-  
-  const action = (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    setQueries({
-      'year': formData.get('year'),
-      'month': formData.get('month'),
-      'start': formData.get('start'),
-      'end': formData.get('end')
-    })
-    console.log(queries)
-    // e.target.reset()
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setQueries(prev => ({
+      ...prev,
+      [name]: value
+    }));
   }
   
   const prepareChart = (chart) => {
@@ -84,30 +78,29 @@ function App() {
         </button>
       </li>
       {chart && 
-        <form onSubmit={action}>
+        <form onChange={handleChange}>
           <label>Year</label>
-          <select name='year'>
+          <select name='year' value={queries.year}>
             <option value={''}>—</option>
             {dateOptions.years.map(x => (
               <option key={x} value={x}>{x}</option>
             ))}
           </select>
           <label>Month</label>
-          <select name='month'>
+          <select name='month' value={queries.month}>
             <option value={''}>—</option>
             {dateOptions.months.map(x => (
               <option key={x} value={x}>{getMonth(x)}</option>
             ))}
           </select>
           <label>Start</label>
-          <input type='date' name='start' />
+          <input type='date' name='start' value={queries.start} max={queries.end}/>
           <label>End</label>
-          <input type='date' name='end' />
-          <button type='submit'>Filter</button>
+          <input type='date' name='end' value={queries.end} min={queries.start}/>
+          <button type='button' onClick={() => setQueries(intiialQueryState)}>Reset Filters</button>
         </form>}
       {chart && 
         <select onChange={(e) => {setChartType(e.target.value)}}>
-          {}
           <option value='pie'>Pie</option>
           <option value='line'>Line</option>
           <option value='bar'>Bar</option>
